@@ -25,7 +25,7 @@ class Settings:
         self.ffmpeg_audio_codec = os.getenv("AMT_FFMPEG_AUDIO_CODEC", "pcm_s16le")
         
         # Processing defaults
-        self.default_fps = float(os.getenv("AMT_DEFAULT_FPS", "10.0"))
+        self.default_fps = float(os.getenv("AMT_DEFAULT_FPS", "0.1"))
         self.max_frames_per_video = None
         max_frames_str = os.getenv("AMT_MAX_FRAMES_PER_VIDEO")
         if max_frames_str:

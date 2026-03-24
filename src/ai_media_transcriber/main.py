@@ -41,8 +41,8 @@ def process(
         help="Output format(s): json, markdown, text, or all",
         metavar="FORMAT"
     ),
-    fps: float = typer.Option(
-        1.0,
+    fps: Optional[float] = typer.Option(
+        None,
         "--fps",
         help="Frames per second to extract from video"
     ),
@@ -101,6 +101,8 @@ def process(
             formats = [output_format.lower()]
         
         # Create processing configuration
+        fps = fps or settings.default_fps
+        max_frames = max_frames or settings.max_frames_per_video
         config = ProcessingConfig(
             fps=fps,
             max_frames=max_frames,

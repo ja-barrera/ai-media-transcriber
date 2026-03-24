@@ -186,7 +186,7 @@ class OpenAIClient:
         Raises:
             Exception: If summarization fails
         """
-        max_completion_tokens = max_completion_tokens or settings.openai_max_completion_tokens_summary
+        max_completion_tokens = max_completion_tokens or settings.openai_max_tokens_summary
         
         # Build context for summarization
         context = f"Transcript:\n{transcript}"
