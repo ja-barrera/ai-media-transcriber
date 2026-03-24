@@ -76,13 +76,13 @@ class VideoAnalysisPipeline:
             audio_path = self._extract_audio(video_path, artifact_manager)
             
             # Stage 2: Transcription
-            logger.info("\n" + "=" * 50)
+            logger.info("=" * 50)
             logger.info("STAGE 2: Transcribing audio...")
             logger.info("=" * 50)
             transcript = self._transcribe_audio(audio_path)
             
             # Stage 3: Frame extraction and analysis
-            logger.info("\n" + "=" * 50)
+            logger.info("=" * 50)
             logger.info("STAGE 3: Extracting and analyzing frames...")
             logger.info("=" * 50)
             frame_analyses = self._analyze_frames(
@@ -92,7 +92,7 @@ class VideoAnalysisPipeline:
             )
             
             # Stage 4: Summarization
-            logger.info("\n" + "=" * 50)
+            logger.info("=" * 50)
             logger.info("STAGE 4: Generating summary...")
             logger.info("=" * 50)
             
@@ -119,7 +119,7 @@ class VideoAnalysisPipeline:
             # Calculate processing time
             processing_time = time.time() - start_time
             
-            logger.info("\n" + "=" * 50)
+            logger.info("=" * 50)
             logger.info("Pipeline completed successfully!")
             logger.info(f"Total processing time: {processing_time:.2f} seconds")
             logger.info("=" * 50)

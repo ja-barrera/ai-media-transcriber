@@ -134,7 +134,7 @@ class OpenAIClient:
             # Call GPT-4V via chat completions
             response = self.client.chat.completions.create(
                 model=self.vision_model,
-                max_tokens=500,
+                max_completion_tokens=500,
                 messages=[
                     {
                         "role": "user",
@@ -170,7 +170,7 @@ class OpenAIClient:
         self,
         transcript: str,
         frame_descriptions: list[str] = None,
-        max_tokens: Optional[int] = None
+        max_completion_tokens: Optional[int] = None
     ) -> dict:
         """
         Generate a summary from transcript and optional frame descriptions.
@@ -178,7 +178,7 @@ class OpenAIClient:
         Args:
             transcript: Full transcript text
             frame_descriptions: List of frame descriptions (optional)
-            max_tokens: Maximum tokens for response (uses config default if not set)
+            max_completion_tokens: Maximum tokens for response (uses config default if not set)
         
         Returns:
             Dictionary with summary, key_points, topics, and action_items
@@ -186,7 +186,7 @@ class OpenAIClient:
         Raises:
             Exception: If summarization fails
         """
-        max_tokens = max_tokens or settings.openai_max_tokens_summary
+        max_completion_tokens = max_completion_tokens or settings.openai_max_completion_tokens_summary
         
         # Build context for summarization
         context = f"Transcript:\n{transcript}"
@@ -202,7 +202,7 @@ class OpenAIClient:
         try:
             response = self.client.chat.completions.create(
                 model=self.summarization_model,
-                max_tokens=max_tokens,
+                max_completion_tokens=max_completion_tokens,
                 temperature=settings.openai_temperature,
                 messages=[
                     {

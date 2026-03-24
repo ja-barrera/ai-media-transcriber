@@ -12,10 +12,10 @@ class Settings:
     def __init__(self):
         # Load from environment variables, with defaults
         self.openai_api_key = os.getenv("OPENAI_API_KEY") or os.getenv("AMT_OPENAI_API_KEY", "")
-        self.openai_model_transcription = os.getenv("AMT_OPENAI_MODEL_TRANSCRIPTION", "whisper-1")
-        self.openai_model_vision = os.getenv("AMT_OPENAI_MODEL_VISION", "gpt-4-vision-preview")
-        self.openai_model_summarization = os.getenv("AMT_OPENAI_MODEL_SUMMARIZATION", "gpt-4-turbo-preview")
-        self.openai_temperature = float(os.getenv("AMT_OPENAI_TEMPERATURE", "0.7"))
+        self.openai_model_transcription = os.getenv("AMT_OPENAI_MODEL_TRANSCRIPTION", "gpt-4o-mini-transcribe")
+        self.openai_model_vision = os.getenv("AMT_OPENAI_MODEL_VISION", "gpt-5.4-nano")
+        self.openai_model_summarization = os.getenv("AMT_OPENAI_MODEL_SUMMARIZATION", "gpt-5.4-nano")
+        self.openai_temperature = float(os.getenv("AMT_OPENAI_TEMPERATURE", "0.3"))
         self.openai_max_tokens_summary = int(os.getenv("AMT_OPENAI_MAX_TOKENS_SUMMARY", "2000"))
         self.openai_timeout = int(os.getenv("AMT_OPENAI_TIMEOUT", "60"))
         
@@ -25,7 +25,7 @@ class Settings:
         self.ffmpeg_audio_codec = os.getenv("AMT_FFMPEG_AUDIO_CODEC", "pcm_s16le")
         
         # Processing defaults
-        self.default_fps = float(os.getenv("AMT_DEFAULT_FPS", "1.0"))
+        self.default_fps = float(os.getenv("AMT_DEFAULT_FPS", "10.0"))
         self.max_frames_per_video = None
         max_frames_str = os.getenv("AMT_MAX_FRAMES_PER_VIDEO")
         if max_frames_str:
