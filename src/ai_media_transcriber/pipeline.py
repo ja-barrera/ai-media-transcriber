@@ -1,6 +1,6 @@
 """
-Main pipeline orchestrator for video analysis.
-Coordinates extraction, transcription, frame analysis, and summarization.
+Main pipeline orchestrator for media analysis.
+Coordinates extraction, transcription, frame analysis, and summarization across multiple media types.
 """
 import time
 from pathlib import Path
@@ -8,7 +8,7 @@ from typing import Optional
 
 from .config import settings
 from .logger import setup_logger
-from .types import Transcript, FrameAnalysis, Summary, ProcessingConfig, ProcessingResult
+from .types import VideoTranscript, VideoFrameAnalysis, VideoSummary, ProcessingConfig, VideoProcessingResult, AudioTranscript
 from .ffmpeg_processor import extract_audio, extract_frames, get_video_duration
 from .file_utils import ArtifactManager, validate_video_file
 from .openai_client import OpenAIClient
@@ -16,10 +16,11 @@ from .openai_client import OpenAIClient
 logger = setup_logger(__name__)
 
 
-class VideoAnalysisPipeline:
+class MediaAnalysisPipeline:
     """
-    Main orchestrator for video analysis pipeline.
+    Main orchestrator for media analysis pipeline.
     Coordinates all stages: extraction, transcription, analysis, and summarization.
+    Supports video, audio, and image processing.
     """
     
     def __init__(self, openai_api_key: Optional[str] = None):
@@ -36,7 +37,7 @@ class VideoAnalysisPipeline:
         video_path: str,
         config: ProcessingConfig = None,
         output_dir: str = "output"
-    ) -> ProcessingResult:
+    ) -> VideoProcessingResult:
         """
         Process a video through the complete analysis pipeline.
         
@@ -46,7 +47,7 @@ class VideoAnalysisPipeline:
             output_dir: Directory where results will be saved
         
         Returns:
-            ProcessingResult with all analysis data
+            VideoProcessingResult with all analysis data
         
         Raises:
             FileNotFoundError: If video file not found
@@ -104,8 +105,8 @@ class VideoAnalysisPipeline:
                 frame_descriptions=frame_descriptions if frame_descriptions else None
             )
             
-            # Create Summary object
-            summary = Summary(
+            # Create VideoSummary object
+            summary = VideoSummary(
                 title=summary_dict.get('title'),
                 summary=summary_dict.get('summary', ''),
                 key_points=summary_dict.get('key_points', []),
@@ -125,7 +126,7 @@ class VideoAnalysisPipeline:
             logger.info("=" * 50)
             
             # Create result object
-            result = ProcessingResult(
+            result = VideoProcessingResult(
                 video_path=str(video_path),
                 transcript=transcript,
                 frame_analyses=frame_analyses,
@@ -160,7 +161,7 @@ class VideoAnalysisPipeline:
             logger.error(f"✗ Audio extraction failed: {e}")
             raise
     
-    def _transcribe_audio(self, audio_path: str) -> Transcript:
+    def _transcribe_audio(self, audio_path: str) -> VideoTranscript:
         """Transcribe audio using Whisper."""
         try:
             # Get file size to estimate duration
@@ -183,7 +184,7 @@ class VideoAnalysisPipeline:
         video_path: str,
         artifact_manager: ArtifactManager,
         config: ProcessingConfig
-    ) -> list[FrameAnalysis]:
+    ) -> list[VideoFrameAnalysis]:
         """Extract frames and analyze them."""
         frames_dir = artifact_manager.get_frames_dir()
         
@@ -216,7 +217,7 @@ class VideoAnalysisPipeline:
                     # timestamp = (frame_number / fps)
                     timestamp = (idx / config.fps) if config.fps > 0 else 0
                     
-                    analysis = FrameAnalysis(
+                    analysis = VideoFrameAnalysis(
                         frame_number=idx + 1,
                         timestamp_seconds=timestamp,
                         image_path=str(frame_path),

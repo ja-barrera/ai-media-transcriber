@@ -11,7 +11,7 @@ from openai.types.audio import Transcription
 
 from .config import settings
 from .logger import setup_logger
-from .types import Transcript, FrameAnalysis
+from .types import VideoTranscript, VideoFrameAnalysis, AudioTranscript
 
 logger = setup_logger(__name__)
 
@@ -45,7 +45,7 @@ class OpenAIClient:
         self.summarization_model = settings.openai_model_summarization
         logger.info("OpenAI client initialized")
     
-    def transcribe_audio(self, audio_path: str) -> Transcript:
+    def transcribe_audio(self, audio_path: str) -> AudioTranscript:
         """
         Transcribe audio using Whisper.
         
@@ -53,7 +53,7 @@ class OpenAIClient:
             audio_path: Path to audio file (WAV, MP3, etc.)
         
         Returns:
-            Transcript object containing transcription and metadata
+            AudioTranscript object containing transcription and metadata
         
         Raises:
             FileNotFoundError: If audio file not found
@@ -84,7 +84,7 @@ class OpenAIClient:
                 f"Transcription completed: {word_count} words"
             )
             
-            return Transcript(
+            return AudioTranscript(
                 text=transcript_text,
                 duration_seconds=0.0,  # Would need to calculate from audio
                 word_count=word_count

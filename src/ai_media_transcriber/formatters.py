@@ -6,7 +6,7 @@ import json
 from datetime import datetime
 from typing import Optional
 
-from .types import ProcessingResult
+from .types import VideoProcessingResult
 from .logger import setup_logger
 
 logger = setup_logger(__name__)
@@ -16,12 +16,12 @@ class OutputFormatter:
     """Formats analysis results for output."""
     
     @staticmethod
-    def format_as_json(result: ProcessingResult) -> str:
+    def format_video_as_json(result: VideoProcessingResult) -> str:
         """
-        Format result as JSON.
+        Format video result as JSON.
         
         Args:
-            result: ProcessingResult object
+            result: VideoProcessingResult object
         
         Returns:
             JSON string representation
@@ -47,12 +47,12 @@ class OutputFormatter:
         return json.dumps(data, indent=2, default=str)
     
     @staticmethod
-    def format_as_markdown(result: ProcessingResult) -> str:
+    def format_video_as_markdown(result: VideoProcessingResult) -> str:
         """
-        Format result as Markdown.
+        Format video result as Markdown.
         
         Args:
-            result: ProcessingResult object
+            result: VideoProcessingResult object
         
         Returns:
             Markdown string representation
@@ -116,12 +116,12 @@ class OutputFormatter:
         return "\n".join(lines)
     
     @staticmethod
-    def format_as_text(result: ProcessingResult) -> str:
+    def format_video_as_text(result: VideoProcessingResult) -> str:
         """
-        Format result as plain text.
+        Format video result as plain text.
         
         Args:
-            result: ProcessingResult object
+            result: VideoProcessingResult object
         
         Returns:
             Plain text string representation
@@ -413,7 +413,7 @@ class OutputFormatter:
     
     @staticmethod
     def format_and_save(
-        result: ProcessingResult,
+        result: VideoProcessingResult,
         output_dir: str,
         formats: list[str] = None
     ) -> dict[str, str]:
@@ -421,7 +421,7 @@ class OutputFormatter:
         Format results and save to files.
         
         Args:
-            result: ProcessingResult object
+            result: VideoProcessingResult object
             output_dir: Directory where files will be saved
             formats: List of formats to save (json, markdown, text)
                     Defaults to ['json']
@@ -447,7 +447,7 @@ class OutputFormatter:
         # JSON format
         if 'json' in formats:
             json_path = f"{base_path}.json"
-            json_content = OutputFormatter.format_as_json(result)
+            json_content = OutputFormatter.format_video_as_json(result)
             with open(json_path, 'w', encoding='utf-8') as f:
                 f.write(json_content)
             output_paths['json'] = json_path
@@ -456,7 +456,7 @@ class OutputFormatter:
         # Markdown format
         if 'markdown' in formats:
             md_path = f"{base_path}.md"
-            md_content = OutputFormatter.format_as_markdown(result)
+            md_content = OutputFormatter.format_video_as_markdown(result)
             with open(md_path, 'w', encoding='utf-8') as f:
                 f.write(md_content)
             output_paths['markdown'] = md_path
@@ -465,7 +465,7 @@ class OutputFormatter:
         # Text format
         if 'text' in formats:
             txt_path = f"{base_path}.txt"
-            txt_content = OutputFormatter.format_as_text(result)
+            txt_content = OutputFormatter.format_video_as_text(result)
             with open(txt_path, 'w', encoding='utf-8') as f:
                 f.write(txt_content)
             output_paths['text'] = txt_path

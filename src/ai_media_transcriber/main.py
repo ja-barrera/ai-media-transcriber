@@ -11,7 +11,7 @@ import typer
 from .config import settings
 from .logger import setup_logger
 from .types import ProcessingConfig
-from .pipeline import VideoAnalysisPipeline
+from .pipeline import MediaAnalysisPipeline
 from .formatters import OutputFormatter
 from .file_detector import detect_file_type, FileType
 
@@ -116,7 +116,7 @@ def process(
         file_type = detect_file_type(file_path)
         
         # Create pipeline
-        pipeline = VideoAnalysisPipeline(openai_api_key=api_key)
+        pipeline = MediaAnalysisPipeline(openai_api_key=api_key)
         
         # Route to appropriate processor
         if file_type == FileType.VIDEO:

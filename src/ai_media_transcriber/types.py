@@ -6,7 +6,7 @@ from typing import Optional
 from pydantic import BaseModel, Field
 
 
-class Transcript(BaseModel):
+class VideoTranscript(BaseModel):
     """Represents a video transcript with metadata."""
     text: str = Field(..., description="Full transcription text")
     duration_seconds: float = Field(..., description="Duration of audio in seconds")
@@ -24,7 +24,25 @@ class Transcript(BaseModel):
         }
 
 
-class FrameAnalysis(BaseModel):
+class AudioTranscript(BaseModel):
+    """Represents an audio transcript with metadata."""
+    text: str = Field(..., description="Full transcription text")
+    duration_seconds: float = Field(..., description="Duration of audio in seconds")
+    word_count: int = Field(..., description="Number of words in transcript")
+    extracted_at: datetime = Field(default_factory=datetime.now)
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "text": "Hello everyone, today we're discussing...",
+                "duration_seconds": 1800.0,
+                "word_count": 2500,
+                "extracted_at": "2026-03-20T10:30:00"
+            }
+        }
+
+
+class VideoFrameAnalysis(BaseModel):
     """Analysis of a single frame from the video."""
     frame_number: int = Field(..., description="Frame number in sequence")
     timestamp_seconds: float = Field(..., description="Timestamp in video where frame appears")
@@ -42,7 +60,7 @@ class FrameAnalysis(BaseModel):
         }
 
 
-class Summary(BaseModel):
+class VideoSummary(BaseModel):
     """Complete analysis summary for a video."""
     title: Optional[str] = Field(None, description="Generated title for the video")
     summary: str = Field(..., description="Comprehensive summary of video content")
@@ -90,12 +108,12 @@ class ProcessingConfig(BaseModel):
         }
 
 
-class ProcessingResult(BaseModel):
+class VideoProcessingResult(BaseModel):
     """Complete result of video processing."""
     video_path: str = Field(..., description="Path to input video")
-    transcript: Transcript = Field(..., description="Extracted transcript")
-    frame_analyses: list[FrameAnalysis] = Field(default_factory=list, description="Analysis of extracted frames")
-    summary: Summary = Field(..., description="Generated summary")
+    transcript: VideoTranscript = Field(..., description="Extracted transcript")
+    frame_analyses: list[VideoFrameAnalysis] = Field(default_factory=list, description="Analysis of extracted frames")
+    summary: VideoSummary = Field(..., description="Generated summary")
     processing_time_seconds: float = Field(..., description="Total processing time in seconds")
     output_paths: dict[str, str] = Field(default_factory=dict, description="Paths to output files (json, markdown, text)")
     
@@ -187,7 +205,7 @@ class AudioSummary(BaseModel):
 class AudioProcessingResult(BaseModel):
     """Result of audio processing."""
     audio_path: str = Field(..., description="Path to input audio file")
-    transcript: Transcript = Field(..., description="Extracted transcript")
+    transcript: AudioTranscript = Field(..., description="Extracted transcript")
     summary: AudioSummary = Field(..., description="Generated summary")
     processing_time_seconds: float = Field(..., description="Total processing time in seconds")
     output_paths: dict[str, str] = Field(default_factory=dict, description="Paths to output files")
