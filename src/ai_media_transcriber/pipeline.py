@@ -234,3 +234,105 @@ class VideoAnalysisPipeline:
         except Exception as e:
             logger.error(f"✗ Frame analysis failed: {e}")
             raise
+    
+    def process_audio(
+        self,
+        audio_path: str,
+        output_dir: str = "output"
+    ):
+        """
+        Process an audio file: transcribe and summarize.
+        
+        Args:
+            audio_path: Path to audio file
+            output_dir: Directory where results will be saved
+        
+        Returns:
+            AudioProcessingResult
+        """
+        from .types import AudioSummary, AudioProcessingResult
+        
+        start_time = time.time()
+        
+        logger.info(f"\n" + "=" * 50)
+        logger.info(f"Processing audio: {audio_path}")
+        logger.info("=" * 50)
+        
+        try:
+            # Transcribe audio
+            logger.info("\n" + "=" * 50)
+            logger.info("STAGE 1: Transcribing audio...")
+            logger.info("=" * 50)
+            transcript = self.client.transcribe_audio(audio_path)
+            logger.info(f"✓ Transcript: {transcript.word_count} words")
+            
+            # Generate summary
+            logger.info("\n" + "=" * 50)
+            logger.info("STAGE 2: Generating summary...")
+            logger.info("=" * 50)
+            summary_dict = self.client.summarize(transcript.text)
+            
+            audio_summary = AudioSummary(
+                title=summary_dict.get('title'),
+                summary=summary_dict.get('summary', ''),
+                key_points=summary_dict.get('key_points', []),
+                topics=summary_dict.get('topics', [])
+            )
+            
+            processing_time = time.time() - start_time
+            
+            logger.info("\n" + "=" * 50)
+            logger.info("Audio processing completed!")
+            logger.info(f"Total processing time: {processing_time:.2f} seconds")
+            logger.info("=" * 50)
+            
+            return AudioProcessingResult(
+                audio_path=str(audio_path),
+                transcript=transcript,
+                summary=audio_summary,
+                processing_time_seconds=processing_time
+            )
+        
+        except Exception as e:
+            logger.error(f"✗ Audio processing failed: {e}")
+            raise
+    
+    def process_images(
+        self,
+        image_paths: list[str],
+        output_dir: str = "output"
+    ):
+        """
+        Process image(s): analyze and optionally consolidate.
+        
+        Args:
+            image_paths: List of paths to image files
+            output_dir: Directory where results will be saved
+        
+        Returns:
+            ImageProcessingResult
+        """
+        from .image_processor import ImageProcessor
+        import time
+        
+        start_time = time.time()
+        
+        logger.info(f"\n" + "=" * 50)
+        logger.info(f"Processing {len(image_paths)} image(s)")
+        logger.info("=" * 50)
+        
+        try:
+            processor = ImageProcessor()
+            result = processor.process_images_batch(image_paths)
+            result.processing_time_seconds = time.time() - start_time
+            
+            logger.info("\n" + "=" * 50)
+            logger.info("Image processing completed!")
+            logger.info(f"Total processing time: {result.processing_time_seconds:.2f} seconds")
+            logger.info("=" * 50)
+            
+            return result
+        
+        except Exception as e:
+            logger.error(f"✗ Image processing failed: {e}")
+            raise

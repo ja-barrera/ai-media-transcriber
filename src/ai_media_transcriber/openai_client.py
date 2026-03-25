@@ -333,3 +333,71 @@ class OpenAIClient:
         
         logger.info(f"Split transcript into {len(chunks)} chunks")
         return chunks
+    
+    def consolidate_image_descriptions(
+        self,
+        descriptions: list[str],
+        image_count: int = None,
+        max_tokens: Optional[int] = None
+    ) -> dict:
+        """
+        Generate a consolidated summary from multiple image descriptions.
+        
+        Args:
+            descriptions: List of image descriptions
+            image_count: Total number of images (for context)
+            max_tokens: Maximum tokens for response
+        
+        Returns:
+            Dictionary with consolidated_summary and common_themes
+        """
+        max_tokens = max_tokens or settings.openai_max_tokens_summary
+        image_count = image_count or len(descriptions)
+        
+        # Build context
+        combined = "\n".join(
+            f"Image {i+1}: {desc}"
+            for i, desc in enumerate(descriptions)
+        )
+        
+        context = (
+            f"I have analyzed {image_count} images. Here are the descriptions:\n\n"
+            f"{combined}\n\n"
+            f"Please provide:\n"
+            f"1. A consolidated summary tying together insights from all images\n"
+            f"2. Common themes appearing across images\n"
+            f"Keep concise: summary is 2-3 paragraphs, themes as bullets."
+        )
+        
+        logger.info("Generating consolidated image summary")
+        
+        try:
+            response = self.client.chat.completions.create(
+                model=self.summarization_model,
+                max_tokens=max_tokens,
+                temperature=settings.openai_temperature,
+                messages=[
+                    {
+                        "role": "system",
+                        "content": (
+                            "You are an expert at analyzing and synthesizing information "
+                            "from multiple images. Identify common themes, patterns, and "
+                            "provide insightful consolidated analysis."
+                        )
+                    },
+                    {
+                        "role": "user",
+                        "content": context
+                    }
+                ]
+            )
+            
+            summary_text = response.choices[0].message.content
+            result = self._parse_summary_response(summary_text)
+            
+            logger.info("Consolidated summary generated")
+            return result
+        
+        except Exception as e:
+            logger.error(f"Consolidation failed: {e}")
+            raise

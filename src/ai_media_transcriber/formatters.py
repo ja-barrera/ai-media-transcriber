@@ -192,6 +192,226 @@ class OutputFormatter:
         return "\n".join(lines)
     
     @staticmethod
+    def format_image_as_json(result) -> str:
+        """
+        Format image analysis result as JSON.
+        
+        Args:
+            result: ImageProcessingResult object
+        
+        Returns:
+            JSON string
+        """
+        data = {
+            "image_paths": result.image_paths,
+            "image_count": len(result.image_paths),
+            "analyses": [
+                {
+                    "image_path": analysis.image_path,
+                    "description": analysis.description
+                }
+                for analysis in result.analyses
+            ],
+            "processing_time_seconds": result.processing_time_seconds
+        }
+        
+        if result.consolidated_summary:
+            data["consolidated_summary"] = {
+                "summary": result.consolidated_summary.consolidated_summary,
+                "common_themes": result.consolidated_summary.common_themes
+            }
+        
+        return json.dumps(data, indent=2, default=str)
+    
+    @staticmethod
+    def format_image_as_markdown(result) -> str:
+        """
+        Format image analysis result as Markdown.
+        
+        Args:
+            result: ImageProcessingResult object
+        
+        Returns:
+            Markdown string
+        """
+        lines = []
+        
+        # Header
+        title = "Image Analysis" if len(result.image_paths) == 1 else f"Image Analysis ({len(result.image_paths)} images)"
+        lines.append(f"# {title}")
+        lines.append("")
+        
+        # Metadata
+        lines.append("## Metadata")
+        lines.append(f"- **Images analyzed**: {len(result.image_paths)}")
+        lines.append(f"- **Processing time**: {result.processing_time_seconds:.1f} seconds")
+        lines.append("")
+        
+        # Consolidated summary (if available)
+        if result.consolidated_summary:
+            lines.append("## Consolidated Summary")
+            lines.append(result.consolidated_summary.consolidated_summary)
+            lines.append("")
+            
+            if result.consolidated_summary.common_themes:
+                lines.append("### Common Themes")
+                for theme in result.consolidated_summary.common_themes:
+                    lines.append(f"- {theme}")
+                lines.append("")
+        
+        # Individual analyses
+        lines.append("## Individual Image Analyses")
+        lines.append("")
+        
+        for idx, analysis in enumerate(result.analyses, 1):
+            lines.append(f"### Image {idx}")
+            lines.append(f"**File**: {analysis.image_path}")
+            lines.append("")
+            lines.append(analysis.description)
+            lines.append("")
+        
+        return "\n".join(lines)
+    
+    @staticmethod
+    def format_audio_as_json(result) -> str:
+        """
+        Format audio analysis result as JSON.
+        
+        Args:
+            result: AudioProcessingResult object
+        
+        Returns:
+            JSON string
+        """
+        data = {
+            "audio_path": result.audio_path,
+            "transcript": {
+                "text": result.transcript.text,
+                "duration_seconds": result.transcript.duration_seconds,
+                "word_count": result.transcript.word_count
+            },
+            "summary": {
+                "title": result.summary.title,
+                "summary": result.summary.summary,
+                "key_points": result.summary.key_points,
+                "topics": result.summary.topics
+            },
+            "processing_time_seconds": result.processing_time_seconds
+        }
+        
+        return json.dumps(data, indent=2, default=str)
+    
+    @staticmethod
+    def format_audio_as_markdown(result) -> str:
+        """
+        Format audio analysis result as Markdown.
+        
+        Args:
+            result: AudioProcessingResult object
+        
+        Returns:
+            Markdown string
+        """
+        lines = []
+        
+        # Header
+        lines.append(f"# {result.summary.title}")
+        lines.append("")
+        
+        # Metadata
+        lines.append("## Metadata")
+        lines.append(f"- **Audio file**: {result.audio_path}")
+        lines.append(f"- **Duration**: {result.transcript.duration_seconds:.1f} seconds")
+        lines.append(f"- **Transcript length**: {result.transcript.word_count} words")
+        lines.append(f"- **Processing time**: {result.processing_time_seconds:.1f} seconds")
+        lines.append("")
+        
+        # Summary
+        lines.append("## Summary")
+        lines.append(result.summary.summary)
+        lines.append("")
+        
+        # Key Points
+        if result.summary.key_points:
+            lines.append("## Key Points")
+            for point in result.summary.key_points:
+                lines.append(f"- {point}")
+            lines.append("")
+        
+        # Topics
+        if result.summary.topics:
+            lines.append("## Topics Covered")
+            for topic in result.summary.topics:
+                lines.append(f"- {topic}")
+            lines.append("")
+        
+        # Full Transcript
+        lines.append("## Full Transcript")
+        lines.append("")
+        lines.append(result.transcript.text)
+        lines.append("")
+        
+        return "\n".join(lines)
+    
+    @staticmethod
+    def format_audio_as_text(result) -> str:
+        """
+        Format audio analysis as plain text.
+        
+        Args:
+            result: AudioProcessingResult object
+        
+        Returns:
+            Plain text string
+        """
+        lines = []
+        
+        # Header
+        lines.append("=" * 70)
+        lines.append(result.summary.title.center(70))
+        lines.append("=" * 70)
+        lines.append("")
+        
+        # Metadata
+        lines.append("METADATA")
+        lines.append("-" * 70)
+        lines.append(f"Audio file:         {result.audio_path}")
+        lines.append(f"Duration:           {result.transcript.duration_seconds:.1f} seconds")
+        lines.append(f"Transcript length:  {result.transcript.word_count} words")
+        lines.append(f"Processing time:    {result.processing_time_seconds:.1f} seconds")
+        lines.append("")
+        
+        # Summary
+        lines.append("SUMMARY")
+        lines.append("-" * 70)
+        lines.append(result.summary.summary)
+        lines.append("")
+        
+        # Key Points
+        if result.summary.key_points:
+            lines.append("KEY POINTS")
+            lines.append("-" * 70)
+            for i, point in enumerate(result.summary.key_points, 1):
+                lines.append(f"{i}. {point}")
+            lines.append("")
+        
+        # Topics
+        if result.summary.topics:
+            lines.append("TOPICS COVERED")
+            lines.append("-" * 70)
+            for topic in result.summary.topics:
+                lines.append(f"• {topic}")
+            lines.append("")
+        
+        # Full Transcript
+        lines.append("FULL TRANSCRIPT")
+        lines.append("-" * 70)
+        lines.append(result.transcript.text)
+        lines.append("")
+        
+        return "\n".join(lines)
+    
+    @staticmethod
     def format_and_save(
         result: ProcessingResult,
         output_dir: str,

@@ -114,3 +114,91 @@ class ProcessingResult(BaseModel):
                 }
             }
         }
+
+
+class ImageAnalysis(BaseModel):
+    """Analysis of a single image."""
+    image_path: str = Field(..., description="Path to the image file")
+    description: str = Field(..., description="AI-generated description of the image")
+    
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "image_path": "photo.jpg",
+                "description": "A sunset over a mountain landscape with golden light..."
+            }
+        }
+
+
+class ConsolidatedImageSummary(BaseModel):
+    """Consolidated summary for multiple images."""
+    consolidated_summary: str = Field(..., description="Summary combining insights from all images")
+    common_themes: list[str] = Field(default_factory=list, description="Themes appearing across images")
+    image_count: int = Field(..., description="Number of images processed")
+    
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "consolidated_summary": "The image collection shows...",
+                "common_themes": ["Nature", "Landscape"],
+                "image_count": 5
+            }
+        }
+
+
+class ImageProcessingResult(BaseModel):
+    """Result of image(s) processing."""
+    image_paths: list[str] = Field(..., description="Paths to input images")
+    analyses: list[ImageAnalysis] = Field(..., description="Individual image analyses")
+    consolidated_summary: Optional[ConsolidatedImageSummary] = Field(None, description="Summary of all images (only for batch)")
+    processing_time_seconds: float = Field(..., description="Total processing time in seconds")
+    output_paths: dict[str, str] = Field(default_factory=dict, description="Paths to output files")
+    
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "image_paths": ["photo1.jpg", "photo2.jpg"],
+                "analyses": [],
+                "consolidated_summary": {},
+                "processing_time_seconds": 30.5,
+                "output_paths": {"json": "output.json"}
+            }
+        }
+
+
+class AudioSummary(BaseModel):
+    """Summary of audio analysis."""
+    title: Optional[str] = Field(None, description="Generated title for the audio")
+    summary: str = Field(..., description="Comprehensive summary of audio content")
+    key_points: list[str] = Field(default_factory=list, description="Main points discussed")
+    topics: list[str] = Field(default_factory=list, description="Topics covered")
+    
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "title": "Podcast Episode Title",
+                "summary": "This episode discusses...",
+                "key_points": ["Point 1", "Point 2"],
+                "topics": ["Topic A"]
+            }
+        }
+
+
+class AudioProcessingResult(BaseModel):
+    """Result of audio processing."""
+    audio_path: str = Field(..., description="Path to input audio file")
+    transcript: Transcript = Field(..., description="Extracted transcript")
+    summary: AudioSummary = Field(..., description="Generated summary")
+    processing_time_seconds: float = Field(..., description="Total processing time in seconds")
+    output_paths: dict[str, str] = Field(default_factory=dict, description="Paths to output files")
+    
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "audio_path": "podcast.mp3",
+                "transcript": {},
+                "summary": {},
+                "processing_time_seconds": 60.0,
+                "output_paths": {"json": "output.json"}
+            }
+        }
